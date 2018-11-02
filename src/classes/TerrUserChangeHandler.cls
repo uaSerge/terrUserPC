@@ -68,7 +68,7 @@ public class TerrUserChangeHandler {
             delete oldContactShareList;
         }
         List <Database.SaveResult> sres = Database.insert(contactShareListNew, false);
-        validationSave(sres);
+      //  validationSave(sres);
     }
 
     private static void changeAccountShare(List <Id> terID,
