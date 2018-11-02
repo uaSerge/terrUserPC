@@ -46,12 +46,6 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                                            List<TerrUser__c> newTerrUsers,
                                            Map<Id, TerrUser__c> oldMapTerrUser) {
         List<ContactShare> contactShareListNew = new List<ContactShare>();
-
-//        List <Reference__c> referenceList = [
-//                SELECT Name, Account__c, Contact__c
-//                FROM Reference__c
-//                WHERE Account__r.Territory__c in : terID
-//        ];
         List <Id> contactId = new List<Id>();
 
         for (Reference__c r : referenceList) {
@@ -84,12 +78,20 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                 id newUser = terUser.Territory_User__c;
                 if (newUser != null) {
                     for (Contact cont : contactList) {
-                        ContactShare contShare = new ContactShare();
-                        contShare.ContactId = cont.id;
-                        contShare.UserOrGroupId = newUser;
-                        contShare.ContactAccessLevel = 'Edit';
-                        contShare.RowCause = Schema.ContactShare.RowCause.Manual;
-                        contactShareListNew.add(contShare);
+                        Id territory;
+                        for (Reference__c ref : referenceList) {
+                            if (ref.Contact__c == cont.Id) {
+                                territory = ref.Account__r.Territory__c;
+                            }
+                        }
+                        if (territory == terUser.Territory__c) {
+                            ContactShare contShare = new ContactShare();
+                            contShare.ContactId = cont.id;
+                            contShare.UserOrGroupId = newUser;
+                            contShare.ContactAccessLevel = 'Edit';
+                            contShare.RowCause = Schema.ContactShare.RowCause.Manual;
+                            contactShareListNew.add(contShare);
+                        }
                     }
                 }
             }

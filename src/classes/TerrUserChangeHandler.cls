@@ -18,7 +18,7 @@ public class TerrUserChangeHandler {
         List<ContactShare> contactShareListNew = new List<ContactShare>();
 
         List <Reference__c> referenceList = [
-                SELECT Name, Account__c, Contact__c
+                SELECT Name, Account__c, Contact__c,Account__r.Territory__c
                 FROM Reference__c
                 WHERE Account__r.Territory__c in : terID
         ];
@@ -54,12 +54,20 @@ public class TerrUserChangeHandler {
                 id newUser = terUser.Territory_User__c;
                 if (newUser != null) {
                     for (Contact cont : contactList) {
-                        ContactShare contShare = new ContactShare();
-                        contShare.ContactId = cont.id;
-                        contShare.UserOrGroupId = newUser;
-                        contShare.ContactAccessLevel = 'Edit';
-                        contShare.RowCause = Schema.ContactShare.RowCause.Manual;
-                        contactShareListNew.add(contShare);
+                        Id territory;
+                        for (Reference__c ref : referenceList) {
+                            if (ref.Contact__c == cont.Id) {
+                                territory = ref.Account__r.Territory__c;
+                            }
+                        }
+                        if (territory == terUser.Territory__c) {
+                            ContactShare contShare = new ContactShare();
+                            contShare.ContactId = cont.id;
+                            contShare.UserOrGroupId = newUser;
+                            contShare.ContactAccessLevel = 'Edit';
+                            contShare.RowCause = Schema.ContactShare.RowCause.Manual;
+                            contactShareListNew.add(contShare);
+                        }
                     }
                 }
             }
@@ -100,13 +108,15 @@ public class TerrUserChangeHandler {
                 id newUser = terUser.Territory_User__c;
                 if (newUser != null) {
                     for (Account acc : accountList) {
-                        AccountShare accShare = new AccountShare();
-                        accShare.AccountId = acc.id;
-                        accShare.UserOrGroupId = newUser;
-                        accShare.AccountAccessLevel = 'Edit';
-                        accShare.OpportunityAccessLevel = 'Edit';
-                        accShare.RowCause = Schema.AccountShare.RowCause.Manual;
-                        accountShareListNew.add(accShare);
+                        if (terUser.Territory__c == acc.Territory__c) {
+                            AccountShare accShare = new AccountShare();
+                            accShare.AccountId = acc.id;
+                            accShare.UserOrGroupId = newUser;
+                            accShare.AccountAccessLevel = 'Edit';
+                            accShare.OpportunityAccessLevel = 'Edit';
+                            accShare.RowCause = Schema.AccountShare.RowCause.Manual;
+                            accountShareListNew.add(accShare);
+                        }
                     }
                 }
             }
