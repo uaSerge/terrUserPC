@@ -8,9 +8,6 @@ public class TerrUserChangeHandler {
         terID.addAll(getTerritoriesListChild(terID));
         changeAccountShare(terID, newTerrUser, oldMapTerrUser);
         changeContactShare(terID, newTerrUser, oldMapTerrUser);
-
-        //  List <Reference__Share> referenceListNew = new List<Reference__Share>();
-
     }
 
     private static void changeContactShare(List <Id> terID,
