@@ -253,10 +253,12 @@ public class TerrUserChangeHandler {
                 SELECT Territory__c, Territory_User__c
                 FROM TerrUser__c
         ];
-        List <Id> terID = getTerritoriesList(oldMapTerrUser.values());
+        List <Id> terID = getTerritoriesList(newTerrUser);
         List <Id> terIDNew = getTerritoriesListChild(terID);
+        List <Id> terIDParent = getTerritoriesListParent(terID);
+        terIDNew.addAll(terIDParent);
         Map <Id, TerrUser__c> usersWithChildTer = new Map<Id, TerrUser__c>([
-                SELECT Territory__c, Territory_User__c
+                SELECT Territory__c, Territory_User__c,Name
                 FROM TerrUser__c
                 WHERE Territory__r.Id IN :terIDNew
         ]);
@@ -280,5 +282,17 @@ public class TerrUserChangeHandler {
     private static Boolean validTerrUser(TerrUser__c user, TerrUser__c newUser) {
         return(newUser.Territory__c == user.Territory__c) && (newUser.Territory_User__c == user.Territory_User__c) &&
                 (newUser.Territory_User__c != null) && (user.id != newUser.Id);
+    }
+    private static List <Id> getTerritoriesListParent(List <id> listTerr) {
+        List <Territory__c> terWithParentTerritories = [
+                SELECT Name,Territory_level__c, Parent_territory__c
+                FROM Territory__c
+                WHERE Id IN : listTerr
+        ];
+        List <Id> territoryParentId = new List<Id>();
+        for (Territory__c ter : terWithParentTerritories) {
+            territoryParentId.add(ter.Parent_territory__c);
+        }
+        return territoryParentId;
     }
 }
