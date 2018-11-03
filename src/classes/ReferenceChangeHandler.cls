@@ -8,12 +8,12 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
     List <Id> terIDNew = getTerritoriesList(accountListNew);
     List <Id> terIDOld = getTerritoriesList(accountListOld);
     List<TerrUser__c> terrUsersNew = [
-            SELECT Territory_User__c
+            SELECT Territory_User__c, Territory__c
             FROM TerrUser__c
             WHERE Territory__c IN : terIdNew
     ];
     Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
-            SELECT Territory_User__c
+            SELECT Territory_User__c, Territory__c
             FROM TerrUser__c
             WHERE Territory__c IN : terIdOld
     ]);
@@ -24,7 +24,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         List<Account> accountListNew = getAccountListFromRefs(newTriggerRefs);
         List <Id> terIDNew = getTerritoriesList(accountListNew);
         List<TerrUser__c> terrUsersNew = [
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdNew
         ];
@@ -35,7 +35,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         List<Account> accountListOld = getAccountListFromRefs(oldTriggerMapRefs.values());
         List <Id> terIDOld = getTerritoriesList(accountListOld);
         Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdOld
         ]);
@@ -73,18 +73,18 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
             ];
         }
         for (TerrUser__c terUser : newTerrUsers) {
-            if ((oldMapTerrUser.size() == 0) ||
+            if ((oldMapTerrUser.size() == 0) || terUser.Territory_User__c == null||
                     (terUser.Territory_User__c != oldMapTerrUser.get(terUser.Id).Territory_User__c)) {
                 id newUser = terUser.Territory_User__c;
                 if (newUser != null) {
                     for (Contact cont : contactList) {
-                        Id territory;
+                        Boolean canShare = false;
                         for (Reference__c ref : referenceList) {
                             if (ref.Contact__c == cont.Id) {
-                                territory = ref.Account__r.Territory__c;
+                                canShare = (ref.Account__r.Territory__c==terUser.Territory__c);
                             }
                         }
-                        if (territory == terUser.Territory__c) {
+                        if (canShare || (oldMapTerrUser.size() == 0)) {
                             ContactShare contShare = new ContactShare();
                             contShare.ContactId = cont.id;
                             contShare.UserOrGroupId = newUser;

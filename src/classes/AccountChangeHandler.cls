@@ -6,12 +6,12 @@ public class AccountChangeHandler {
         List <Id> terIdNew = getTerritoriesList(newTriggerAccs);
         List <Id> terIdOld = getTerritoriesList(oldTriggerMapAccs.values());
         List<TerrUser__c> terrUsersNew = [
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdNew
         ];
         Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdOld
         ]);
@@ -22,7 +22,7 @@ public class AccountChangeHandler {
     public static void accountChangeAfterInsert (List<Account> newTriggerAccs){
         List <Id> terIdNew = getTerritoriesList(newTriggerAccs);
         List<TerrUser__c> terrUsersNew = [
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdNew
         ];
@@ -33,7 +33,7 @@ public class AccountChangeHandler {
     public static void accountChangeOnAfterDel (Map<Id, Account> oldTriggerMapAccs){
         List <Id> terIdOld = getTerritoriesList(oldTriggerMapAccs.values());
         Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
-                SELECT Territory_User__c
+                SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdOld
         ]);
