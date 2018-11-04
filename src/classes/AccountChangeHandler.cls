@@ -235,7 +235,9 @@ public class AccountChangeHandler {
             oldContactShareList = [
                     SELECT Id, ContactId, UserOrGroupId, ContactAccessLevel
                     FROM ContactShare
-                    WHERE ContactId IN :contactList AND UserOrGroupId IN : userList AND (RowCause = :Schema.ContactShare.RowCause.Manual)
+                    WHERE ContactId IN :contactList
+                    AND UserOrGroupId IN : userList
+                    AND (RowCause = :Schema.ContactShare.RowCause.Manual)
             ];
         }
         Map <Id, List<Territory__c>> mapUsersWithTeritories = getMapUsersWithTeritories(newTerrUsers, terID);

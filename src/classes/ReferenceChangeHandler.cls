@@ -47,7 +47,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdOld
         ]);
-        changeContactShare(oldTriggerMapRefs.values(),new List<TerrUser__c>(),terrUsersOld, new List<Id>());
+        changeContactShare(oldTriggerMapRefs.values(),new List<TerrUser__c>(),terrUsersOld, terIdOld);
     }
 
     private static List <Id> getTerritoriesListParent(List <id> listTerr) {
@@ -88,8 +88,14 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                                            List<TerrUser__c> newTerrUsers,
                                            Map<Id, TerrUser__c> oldMapTerrUser, List <Id> terID) {
         List<ContactShare> contactShareListNew = new List<ContactShare>();
+        if (newTerrUsers.size()>0) {
+            referenceList = [
+                    SELECT Name, Account__c, Contact__c, Account__r.Territory__c
+                    FROM Reference__c
+                    WHERE Account__r.Territory__c in : terID
+            ];
+        }
         List <Id> contactId = new List<Id>();
-
         for (Reference__c r : referenceList) {
             contactId.add(r.Contact__c);
             System.debug('Reference__c.Contact__c = ' + r.Contact__c);
@@ -128,7 +134,9 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                                                 ref.Account__r.Territory__c));
                             }
                         }
-                        if (canShare || (oldMapTerrUser.size() == 0)) {
+                        if (canShare
+                               // || (oldMapTerrUser.size() == 0)&& (newTerrUsers.size() > 0)
+                                ) {
                             ContactShare contShare = new ContactShare();
                             contShare.ContactId = cont.id;
                             contShare.UserOrGroupId = newUser;
