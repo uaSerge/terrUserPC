@@ -7,7 +7,7 @@ trigger AccountChangeTrigger on Account (after update, after insert, after delet
 			AccountChangeHandler.accountChangeAfterInsert(Trigger.new);
 		}
 		if (Trigger.isDelete) {
-			AccountChangeHandler.accountChangeOnAfterDel(Trigger.oldMap);
+//			AccountChangeHandler.accountChangeOnAfterDel(Trigger.oldMap);
 		}
 	}
 }

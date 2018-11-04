@@ -8,8 +8,10 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
     List <Id> terIDNew = getTerritoriesList(accountListNew);
     terIdNew.addAll(getTerritoriesListChild(terIdNew));
     terIdNew.addAll(getTerritoriesListParent(terIdNew));
+    terIdNew.addAll(getTerritoriesListParent(terIdNew));
     List <Id> terIDOld = getTerritoriesList(accountListOld);
     terIdOld.addAll(getTerritoriesListChild(terIdOld));
+    terIdOld.addAll(getTerritoriesListParent(terIdOld));
     terIdOld.addAll(getTerritoriesListParent(terIdOld));
     List<TerrUser__c> terrUsersNew = [
             SELECT Territory_User__c, Territory__c
@@ -29,6 +31,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         List <Id> terIDNew = getTerritoriesList(accountListNew);
         terIdNew.addAll(getTerritoriesListChild(terIdNew));
         terIdNew.addAll(getTerritoriesListParent(terIdNew));
+        terIdNew.addAll(getTerritoriesListParent(terIdNew));
         List<TerrUser__c> terrUsersNew = [
                 SELECT Territory_User__c, Territory__c
                 FROM TerrUser__c
@@ -41,6 +44,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         List<Account> accountListOld = getAccountListFromRefs(oldTriggerMapRefs.values());
         List <Id> terIDOld = getTerritoriesList(accountListOld);
         terIdOld.addAll(getTerritoriesListChild(terIdOld));
+        terIdOld.addAll(getTerritoriesListParent(terIdOld));
         terIdOld.addAll(getTerritoriesListParent(terIdOld));
         Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
                 SELECT Territory_User__c, Territory__c
@@ -225,7 +229,6 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
             terID.add(acc.Territory__c);
             System.debug('Account.Territory__c = ' + acc.Territory__c);
         }
-        System.debug('terID = ' + terID[0]);
         return terID;
     }
 }
