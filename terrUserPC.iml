@@ -2,37 +2,12 @@
 <module type="salesforce.module" version="4">
   <component name="ComponentSet" allManaged="false">
     <type2Names>
-      <SFMetaTypeNamesState type="APEX_TRIGGER" setAll="true" />
-      <SFMetaTypeNamesState type="SHARING_SET" setAll="true" />
       <SFMetaTypeNamesState type="GLOBAL_VALUE_SET" setAll="true" />
       <SFMetaTypeNamesState type="SHARING_RULES" setAll="true" />
-      <SFMetaTypeNamesState type="APEX_CLASS" setAll="true" />
-      <SFMetaTypeNamesState type="CUSTOM_OBJECT">
-        <option name="myNames">
-          <set>
-            <option value="Account" />
-            <option value="AccountCleanInfo" />
-            <option value="AccountContactRole" />
-            <option value="Contact" />
-            <option value="ContactCleanInfo" />
-            <option value="ContentVersion" />
-            <option value="Reference__c" />
-            <option value="TerrUser__c" />
-            <option value="Territory__c" />
-            <option value="User" />
-            <option value="UserProvisioningRequest" />
-          </set>
-        </option>
-      </SFMetaTypeNamesState>
-      <SFMetaTypeNamesState type="PROFILE">
-        <option name="myNames">
-          <set>
-            <option value="Admin" />
-            <option value="Sales manager" />
-          </set>
-        </option>
-      </SFMetaTypeNamesState>
+      <SFMetaTypeNamesState type="APEX_TRIGGER" setAll="true" />
       <SFMetaTypeNamesState type="ROLE" setAll="true" />
+      <SFMetaTypeNamesState type="APEX_CLASS" setAll="true" />
+      <SFMetaTypeNamesState type="SHARING_SET" setAll="true" />
     </type2Names>
     <components>
       <SFMetaComponentState type="ApexClass" chosen="true" isMajor="true" />

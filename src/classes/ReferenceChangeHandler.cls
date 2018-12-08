@@ -2,29 +2,30 @@
  * Created by Serhii on 02.11.2018.
  */
 public class ReferenceChangeHandler {
-public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs, Map<Id, Reference__c> oldTriggerMapRefs) {
-    List<Account> accountListNew = getAccountListFromRefs(newTriggerRefs);
-    List<Account> accountListOld = getAccountListFromRefs(oldTriggerMapRefs.values());
-    List <Id> terIDNew = getTerritoriesList(accountListNew);
-    terIdNew.addAll(getTerritoriesListChild(terIdNew));
-    terIdNew.addAll(getTerritoriesListParent(terIdNew));
-    terIdNew.addAll(getTerritoriesListParent(terIdNew));
-    List <Id> terIDOld = getTerritoriesList(accountListOld);
-    terIdOld.addAll(getTerritoriesListChild(terIdOld));
-    terIdOld.addAll(getTerritoriesListParent(terIdOld));
-    terIdOld.addAll(getTerritoriesListParent(terIdOld));
-    List<TerrUser__c> terrUsersNew = [
-            SELECT Territory_User__c, Territory__c
-            FROM TerrUser__c
-            WHERE Territory__c IN : terIdNew
-    ];
-    Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
-            SELECT Territory_User__c, Territory__c
-            FROM TerrUser__c
-            WHERE Territory__c IN : terIdOld
-    ]);
-    changeContactShare(newTriggerRefs,terrUsersNew,terrUsersOld, terIDNew);
-}
+    public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
+                                                  Map<Id, Reference__c> oldTriggerMapRefs) {
+        List<Account> accountListNew = getAccountListFromRefs(newTriggerRefs);
+        List<Account> accountListOld = getAccountListFromRefs(oldTriggerMapRefs.values());
+        List <Id> terIDNew = getTerritoriesList(accountListNew);
+        terIdNew.addAll(getTerritoriesListChild(terIdNew));
+        terIdNew.addAll(getTerritoriesListParent(terIdNew));
+        terIdNew.addAll(getTerritoriesListParent(terIdNew));
+        List <Id> terIDOld = getTerritoriesList(accountListOld);
+        terIdOld.addAll(getTerritoriesListChild(terIdOld));
+        terIdOld.addAll(getTerritoriesListParent(terIdOld));
+        terIdOld.addAll(getTerritoriesListParent(terIdOld));
+        List<TerrUser__c> terrUsersNew = [
+                SELECT Territory_User__c, Territory__c
+                FROM TerrUser__c
+                WHERE Territory__c IN : terIdNew
+        ];
+        Map<Id, TerrUser__c> terrUsersOld = new Map<Id, TerrUser__c>([
+                SELECT Territory_User__c, Territory__c
+                FROM TerrUser__c
+                WHERE Territory__c IN : terIdOld
+        ]);
+        changeContactShare(newTriggerRefs, terrUsersNew, terrUsersOld, terIDNew);
+    }
 
     public static void referenceChangeAfterInsert(List<Reference__c> newTriggerRefs) {
         List<Account> accountListNew = getAccountListFromRefs(newTriggerRefs);
@@ -37,7 +38,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdNew
         ];
-        changeContactShare(newTriggerRefs,terrUsersNew,new Map<Id, TerrUser__c>(), terIDNew);
+        changeContactShare(newTriggerRefs, terrUsersNew, new Map<Id, TerrUser__c>(), terIDNew);
     }
 
     public static void referenceChangeOnAfterDel(Map<Id, Reference__c> oldTriggerMapRefs) {
@@ -51,7 +52,7 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
                 FROM TerrUser__c
                 WHERE Territory__c IN : terIdOld
         ]);
-        changeContactShare(oldTriggerMapRefs.values(),new List<TerrUser__c>(),terrUsersOld, terIdOld);
+        changeContactShare(oldTriggerMapRefs.values(), new List<TerrUser__c>(), terrUsersOld, terIdOld);
     }
 
     private static List <Id> getTerritoriesListParent(List <id> listTerr) {
@@ -88,11 +89,13 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         }
         return new List<Id>();
     }
+
     private static void changeContactShare(List <Reference__c> referenceList,
                                            List<TerrUser__c> newTerrUsers,
-                                           Map<Id, TerrUser__c> oldMapTerrUser, List <Id> terID) {
+                                           Map<Id, TerrUser__c> oldMapTerrUser,
+                                           List <Id> terID) {
         List<ContactShare> contactShareListNew = new List<ContactShare>();
-        if (newTerrUsers.size()>0) {
+        if (newTerrUsers.size() > 0) {
             referenceList = [
                     SELECT Name, Account__c, Contact__c, Account__r.Territory__c
                     FROM Reference__c
@@ -125,38 +128,33 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         }
         Map <Id, List<Territory__c>> mapUsersWithTeritories = getMapUsersWithTeritories(newTerrUsers, terID);
         for (TerrUser__c terUser : newTerrUsers) {
-//            if ((oldMapTerrUser.size() == 0) || terUser.Territory_User__c == null||
-//                    (terUser.Territory_User__c != oldMapTerrUser.get(terUser.Id).Territory_User__c)) {
-                id newUser = terUser.Territory_User__c;
-                if (newUser != null) {
-                    for (Contact cont : contactList) {
-                        Boolean canShare = false;
-                        for (Reference__c ref : referenceList) {
-                            if (ref.Contact__c == cont.Id) {
-                                canShare = (terUser.Territory__c == ref.Account__r.Territory__c ||
-                                        checkOtherTeritories(mapUsersWithTeritories, terUser,
-                                                ref.Account__r.Territory__c));
-                            }
-                        }
-                        if (canShare
-                               // || (oldMapTerrUser.size() == 0)&& (newTerrUsers.size() > 0)
-                                ) {
-                            ContactShare contShare = new ContactShare();
-                            contShare.ContactId = cont.id;
-                            contShare.UserOrGroupId = newUser;
-                            contShare.ContactAccessLevel = 'Edit';
-                            contShare.RowCause = Schema.ContactShare.RowCause.Manual;
-                            contactShareListNew.add(contShare);
+            id newUser = terUser.Territory_User__c;
+            if (newUser != null) {
+                for (Contact cont : contactList) {
+                    Boolean canShare = false;
+                    for (Reference__c ref : referenceList) {
+                        if (ref.Contact__c == cont.Id) {
+                            canShare = (terUser.Territory__c == ref.Account__r.Territory__c ||
+                                    checkOtherTeritories(mapUsersWithTeritories, terUser,
+                                            ref.Account__r.Territory__c));
                         }
                     }
+                    if (canShare) {
+                        ContactShare contShare = new ContactShare();
+                        contShare.ContactId = cont.id;
+                        contShare.UserOrGroupId = newUser;
+                        contShare.ContactAccessLevel = 'Edit';
+                        contShare.RowCause = Schema.ContactShare.RowCause.Manual;
+                        contactShareListNew.add(contShare);
+                    }
                 }
-          //  }
+            }
         }
         if (oldMapTerrUser.size() > 0) {
             delete oldContactShareList;
         }
         List <Database.SaveResult> sres = Database.insert(contactShareListNew, false);
-          validationSave(sres);
+        validationSave(sres);
     }
 
     private static Boolean checkOtherTeritories(Map <Id, List<Territory__c>> mapUsersWithTeritories,
@@ -166,7 +164,6 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
         Boolean checkDone = false;
         if (territories != null) {
             for (Territory__c ter : territories) {
-
                 checkDone = (ter.Id == accountTerr);
                 if (checkDone) break;
             }
@@ -176,26 +173,35 @@ public static void referenceChangeAfterUpdate(List<Reference__c> newTriggerRefs,
 
     private static Map <Id, List<Territory__c>> getMapUsersWithTeritories(List < TerrUser__c > newTerrUser,
                                                                           List <Id> terID) {
+        terID.addAll(getTerritoriesListChild(terID));
         Map <Id, Territory__c> terWithChildTerritories = new Map<Id, Territory__c>([
                 SELECT Name,Territory_level__c, (SELECT Id,Name,Territory_level__c FROM Territory__r)
                 FROM Territory__c
                 WHERE Id IN : terID
         ]);
-        Map <Id, Territory__c> terWithChildTerritoriesFirstLevel = new Map<Id, Territory__c>([
-                SELECT Name,Territory_level__c
-                FROM Territory__c
-        ]);
         Map <Id, List<Territory__c>> getMapUsersWithTer = new Map<Id, List<Territory__c>>();
         for (TerrUser__c user : newTerrUser) {
-            if (terWithChildTerritories.get(user.Territory__c).Territory_level__c != 1) {
-                if (!getMapUsersWithTer.containsKey(user.Id)) {
-                    getMapUsersWithTer.put(user.Id, terWithChildTerritories.get(user.Territory__c).Territory__r);
-                } else getMapUsersWithTer.get(user.Id).addAll(
-                        terWithChildTerritories.get(user.Territory__c).Territory__r);
-                //     }
-            } else getMapUsersWithTer.put(user.Id, terWithChildTerritoriesFirstLevel.values());
+            if (!getMapUsersWithTer.containsKey(user.Id)) {
+                getMapUsersWithTer.put(user.Id, terWithChildTerritories.get(user.Territory__c).Territory__r);
+            } else getMapUsersWithTer.get(user.Id).addAll(
+                    terWithChildTerritories.get(user.Territory__c).Territory__r);
         }
+        getTerritoriesWihChildSecondLevel(terWithChildTerritories, getMapUsersWithTer);
         return getMapUsersWithTer;
+    }
+
+    public static void getTerritoriesWihChildSecondLevel(Map <Id, Territory__c> terWithChildTerritories,
+                                                         Map <Id, List<Territory__c>> getMapUsersWithTer) {
+        for (Id userId : getMapUsersWithTer.keySet()) {
+            if (getMapUsersWithTer.values() != null && getMapUsersWithTer.values().size() > 0) {
+                for (List <Territory__c> listTer : getMapUsersWithTer.values()) {
+                    for (Territory__c ter : listTer) {
+                        getMapUsersWithTer.get(userId).addAll(
+                                terWithChildTerritories.get(ter.Id).Territory__r);
+                    }
+                }
+            }
+        }
     }
 
     public static void validationSave(List <Database.SaveResult> sres) {

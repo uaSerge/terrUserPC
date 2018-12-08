@@ -12,10 +12,10 @@ trigger TerrUserChangeTrigger on TerrUser__c (after update, after insert, after 
     }
     if (Trigger.isBefore) {
         if (Trigger.isUpdate){
-            TerrUserChangeHandler.noTwoTerrUserWithOneUser(Trigger.new,Trigger.oldMap);
+            TerrUserChangeHandler.noTwoTerrUserWithOneUser(Trigger.new);
         }
         if (Trigger.isInsert){
-            TerrUserChangeHandler.noTwoTerrUserWithOneUser(Trigger.new, new Map<Id, TerrUser__c> ());
+            TerrUserChangeHandler.noTwoTerrUserWithOneUser(Trigger.new);
         }
     }
     }

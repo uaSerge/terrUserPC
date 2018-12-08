@@ -1,13 +1,10 @@
-trigger AccountChangeTrigger on Account (after update, after insert, after delete) {
+trigger AccountChangeTrigger on Account (after update, after insert) {
 	if (Trigger.isAfter) {
 		if (Trigger.isUpdate) {
 			AccountChangeHandler.accountChangeAfterUpdate(Trigger.new,Trigger.oldMap);
 		}
 		if (Trigger.isInsert) {
 			AccountChangeHandler.accountChangeAfterInsert(Trigger.new);
-		}
-		if (Trigger.isDelete) {
-//			AccountChangeHandler.accountChangeOnAfterDel(Trigger.oldMap);
 		}
 	}
 }
